@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "307336454737",
+    "project_id": "home-pharmacy-5b573",
+    "storage_bucket": "home-pharmacy-5b573.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:307336454737:android:539d2091489f7506ffce70",
+        "android_client_info": {
+          "package_name": "com.example.home_pharmacy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "307336454737-50sngqm9irgj14o624jb1hmsiqt5r3u5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6jHy1UHRjegqVsfUkqE5LsPlWlfKvQIg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "307336454737-50sngqm9irgj14o624jb1hmsiqt5r3u5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "307336454737-r4dk75d9s7cmfhpunansnqoagsgfje1f.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.homePharmacy"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

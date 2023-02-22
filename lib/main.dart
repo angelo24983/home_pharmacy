@@ -1,7 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:home_pharmacy/model/drug.dart';
 
-void main() {
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+
+void main() async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -12,7 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Home Pharmacy',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -49,7 +56,17 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  CollectionReference dbReplies =
+      FirebaseFirestore.instance.collection('drugs');
   int _counter = 0;
+
+  List<Drug> items = [];
+
+  @override
+  void initState() {
+    super.initState();
+    getDriversList().then((results) {});
+  }
 
   void _incrementCounter() {
     setState(() {
@@ -58,24 +75,25 @@ class _MyHomePageState extends State<MyHomePage> {
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
+
       _counter++;
+      Drug itemToBeAdded = Drug(_counter.toString(), 'test$_counter');
+
+      dbReplies.add(itemToBeAdded.toFirestore());
+
+      items.add(itemToBeAdded);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Drug> items = [];
-    items.add(Drug('1', 'test1'));
-    items.add(Drug('2', 'test2'));
-    items.add(Drug('3', 'test3'));
-    items.add(Drug('4', 'test4'));
-
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
+
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
@@ -102,19 +120,32 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Expanded(
-              child: ListView.builder(
-                itemCount: items.length,
-                prototypeItem: ListTile(
-                  title: Text(items.first.name),
+            if (items.isNotEmpty)
+              Expanded(
+                child: ListView.builder(
+                  itemCount: items.length,
+                  prototypeItem: ListTile(
+                    title: Text(items.first.name),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: () {
+                        print(items.first.name + 'deleted');
+                      },
+                    ),
+                  ),
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(items[index].name),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () {
+                          print(items[index].name + 'deleted');
+                        },
+                      ),
+                    );
+                  },
                 ),
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(items[index].name),
-                  );
-                },
               ),
-            ),
             const Text(
               'You have pushed the button this many times:',
             ),
@@ -131,5 +162,17 @@ class _MyHomePageState extends State<MyHomePage> {
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  //get firestore instance
+  getDriversList() async {
+    return await dbReplies.get().then((event) {
+      setState(() {
+        for (var doc in event.docs) {
+          items.add(Drug.fromFirestore(doc));
+          print("${doc.id} => ${doc.data()}");
+        }
+      });
+    });
   }
 }
