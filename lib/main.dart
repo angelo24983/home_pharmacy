@@ -56,8 +56,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  CollectionReference dbReplies =
-      FirebaseFirestore.instance.collection('drugs');
+  CollectionReference dbDrugs = FirebaseFirestore.instance.collection('drugs');
   int _counter = 0;
 
   List<Drug> items = [];
@@ -68,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
     getDriversList().then((results) {});
   }
 
-  void _incrementCounter() {
+  void _addDrug() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
@@ -77,9 +76,10 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
 
       _counter++;
-      Drug itemToBeAdded = Drug(_counter.toString(), 'test$_counter');
 
-      dbReplies.add(itemToBeAdded.toFirestore());
+      Drug itemToBeAdded = Drug('test$_counter');
+
+      dbDrugs.add(itemToBeAdded.toFirestore());
 
       items.add(itemToBeAdded);
     });
@@ -121,29 +121,32 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             if (items.isNotEmpty)
-              Expanded(
-                child: ListView.builder(
-                  itemCount: items.length,
-                  prototypeItem: ListTile(
-                    title: Text(items.first.name),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () {
-                        print(items.first.name + 'deleted');
-                      },
-                    ),
-                  ),
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(items[index].name),
+              Flexible(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 150),
+                  child: ListView.builder(
+                    itemCount: items.length,
+                    prototypeItem: ListTile(
+                      title: Text(items.first.name),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete),
                         onPressed: () {
-                          print(items[index].name + 'deleted');
+                          print(items.first.name + 'deleted');
                         },
                       ),
-                    );
-                  },
+                    ),
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(items[index].name),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete),
+                          onPressed: () {
+                            deleteItem(index);
+                          },
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
             const Text(
@@ -157,7 +160,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: _addDrug,
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
@@ -166,7 +169,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   //get firestore instance
   getDriversList() async {
-    return await dbReplies.get().then((event) {
+    return await dbDrugs.get().then((event) {
       setState(() {
         for (var doc in event.docs) {
           items.add(Drug.fromFirestore(doc));
@@ -174,5 +177,16 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       });
     });
+  }
+
+  deleteItem(index) {
+    dbDrugs.doc(items[index].id).delete().then(
+      (doc) {
+        setState(() {
+          items.removeAt(index);
+        });
+      },
+      onError: (e) => print("Error updating document $e"),
+    );
   }
 }
