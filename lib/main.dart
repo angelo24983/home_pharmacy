@@ -64,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    getDriversList().then((results) {});
+    getDrugsList().then((results) {});
   }
 
   void _addDrug() {
@@ -126,23 +126,35 @@ class _MyHomePageState extends State<MyHomePage> {
                   constraints: const BoxConstraints(maxWidth: 150),
                   child: ListView.builder(
                     itemCount: items.length,
-                    prototypeItem: ListTile(
-                      title: Text(items.first.name),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: () {
-                          print(items.first.name + 'deleted');
-                        },
+                    prototypeItem: Card(
+                      child: SizedBox(
+                        width: 300,
+                        height: 100,
+                        child: ListTile(
+                          title: Text(items.first.name),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () {
+                              print('${items.first.name}deleted');
+                            },
+                          ),
+                        ),
                       ),
                     ),
                     itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(items[index].name),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () {
-                            deleteItem(index);
-                          },
+                      return Card(
+                        child: SizedBox(
+                          width: 300,
+                          height: 100,
+                          child: ListTile(
+                            title: Text(items[index].name),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete),
+                              onPressed: () {
+                                deleteItem(index);
+                              },
+                            ),
+                          ),
                         ),
                       );
                     },
@@ -168,7 +180,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   //get firestore instance
-  getDriversList() async {
+  getDrugsList() async {
     return await dbDrugs.get().then((event) {
       setState(() {
         for (var doc in event.docs) {
